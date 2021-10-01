@@ -8,20 +8,17 @@ int mystrlen(char *str){
 }
 
 char *mystradd(char *origin, char *addition){
-    char* str[mystrlen(origin)+ mystrlen(addition)];
-    int i= 0, j=0;
+    char *str = origin + mystrlen(addition);
+   
     
-    while(origin[i]!= "/0"){
-        str[i] = origin[i];
-        i++;
+    while(*addition!= '\0'){
+        *str++ = *addition++;
+    
     }
 
-    while(addition[j] != '/0'){
-        str[i] = origin[j];
-        j++;
-    }
 
-    return str;
+    *str = '\0';
+    return origin;
 
 }
 
