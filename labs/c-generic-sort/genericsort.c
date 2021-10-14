@@ -1,88 +1,119 @@
+//Francisco Ramos - A01636425
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-#define MAX_LINES 5000 
+#define MAX_LINES 10000
 void *lineptr[MAX_LINES];
 
+void quicksort(void *lineptr[], int left, int right,
+	   int (*comp)(void *, void *));
 
-void quicksort(void *lineptr[], int left, int right,int (*comp)(void *, void *));
+void mergesort(void *lineptr[], int left, int right,
+	   int (*comp)(void *, void *));
 
-void mergesort(void *lineptr[], int left, int right, int (*comp)(void *, void *));
+int readlines(FILE *inputFile);
 
-int readLines(FILE *file);
+void writelines(FILE *output, int nlines);
 
-//Me quede creando los ultimo metodos
-int numcmp(char *s1, char* s2)
+int numcmp(char *, char *);
+
+int numcmp(char *s1, char *s2) {
+    double v1 = atof(s1),
+        v2 = atof(s2);
+
+    return (int) (v1 - v2);
+}
 
 
-int main(int argc, char **argv)
-{
-	if(argc> 4 && argc<7){
-		FILE *in;
-		FILE *out;
-		char *method; 
-		bool flag = true;
-		
-		//ReadFile
+void writelines(FILE *output, int nlines) {
+    for (int i = 0; i < nlines; i++) {
+        fprintf(output, "%s", (char *)lineptr[i]);
+    }
+	fclose(output);
+}
 
-		//Si es el quicksort
-		if((strcmp(argv[1], "-n") == 0 ) && argc == 6 && (strcmp(argv[3], "-quicksort") == 0)){
-			
-			method = argv[3];
-			in = fopen(argv[2], "r");
-			
-			if(in == NULL){
-				printf("Archivo no existe o error al buscarlo\n");
-				return -1;
-			}
-		}if(argc == 5 && (strcmp(argv[2], "-mergesort") == 0)){
-			method = argv[2];
-			in = fopen(argv[1], "r");
-			flag = false;
-			if(in == NULL){
-				printf("Archivo no existe o error al buscarlo\n");
-				return -1;
-			}
-		}
+int readlines(FILE *inputFile) {
+    char *line;
 
-		readLines(in);
-		if(flag){//quicksort
-			quicksort(lineptr, 0, numLines-1, (sortNumbers ? (int (*)(void *, void *)) numcmp : (int (*)(void *, void *))strcmp));
-		}else{
+	int lines = 0;
 
-		}
-		
-	}else{
+    size_t len = 0;
+    ssize_t read;
+
+    while ((read = getline(&line, &len, inputFile) != -1)) {
+		if (lines == MAX_LINES) {
+            printf("El archivo es demasiado grande porfavor reduzca las lineas");
+            exit(0);
+        }
+        lineptr[lines] = malloc(strlen(line));
+        strcpy(lineptr[lines++], line);
+    }
+
+	fclose(inputFile);
+    return lines;
+}
+
+
+int main(int argc, char **argv) {
+	if (argc < 2) {
 		printf("El formato debe ser:\n ./genericsort -n numbers.txt -quicksort -o qs_sorted_numbers.txt\n ");
-		printf("o \n./genericsort strings.txt -mergesort -o ms_sorted_strings.txt\n\n");		
+		printf("o \n./genericsort strings.txt -mergesort -o ms_sorted_strings.txt\n\n");
+		return -1;
 	}
+
+
+	FILE *inputFile,
+		 *outputFile;
+
+	char inputName[50] = "",
+		 outputName[50] = ""; 
+
+	int number = 0;
+	
+	if (strcmp(argv[1], "-n") == 0) {
+		if (argc != 6) {	
+			printf("El formato debe ser:\n ./genericsort -n numbers.txt -quicksort -o qs_sorted_numbers.txt\n ");
+			printf("o \n./genericsort strings.txt -mergesort -o ms_sorted_strings.txt\n\n");
+			return -1;
+		}
+		number = 1; // flag to know wether to sort by ints or strs
+	} else if (argc != 5) {
+		printf("El formato debe ser:\n ./genericsort -n numbers.txt -quicksort -o qs_sorted_numbers.txt\n ");
+		printf("o \n./genericsort strings.txt -mergesort -o ms_sorted_strings.txt\n\n");
+		return -1;
+	}
+
+	strcat(inputName, argv[1+number]); // input file name
+
+	if (strcmp(argv[3+number], "-o") != 0) {
+		printf("El formato debe ser:\n ./genericsort -n numbers.txt -quicksort -o qs_sorted_numbers.txt\n ");
+		printf("o \n./genericsort strings.txt -mergesort -o ms_sorted_strings.txt\n\n");
+		return -1;
+	}
+
+	strcat(outputName, argv[4+number]); 
+
+	if ((inputFile = fopen(inputName, "r")) == NULL) {
+		printf("El archivo no puede encontrarse, no existe\n");
+		return 0;
+	}
+
+	int lines = readlines(inputFile);
+
+	if (strcmp(argv[2+number], "-quicksort") == 0) {
+		quicksort(lineptr, 0, lines-1, (number ? (int (*)(void *, void *)) numcmp : (int (*)(void *, void *))strcmp));
+	}if (strcmp(argv[2+number], "-mergesort") == 0) {
+		mergesort(lineptr, 0, lines-1, (number ? (int (*)(void *, void *)) numcmp : (int (*)(void *, void *))strcmp));
+	}
+
+    if ((outputFile = fopen(outputName, "w")) == NULL)
+    {
+        printf("No se puede crear el archivo\n");
+        return -1;
+    }
+
+    writelines(outputFile, lines);
 
     return 0;
 }
-
-int readLines(FILE *file){
-	char *line;
-	int nl = 0;
-	size_t len = 0;
-	ssize_t read;
-
-	while((read = getline(&line, &len, file))!= -1){
-		if(nl==MAX_LINES){
-			printf("Big File try something smaller");
-			return -1;
-		}
-		printf("%s\n",line);
-		lineptr[nl] = malloc(strlen(line));
-		nl ++;
-	}
-
-	fclose(file);
-	return nl;
-
-
-}
-
-
-
-

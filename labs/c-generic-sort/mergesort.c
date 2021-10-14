@@ -4,12 +4,12 @@ void mergesort(void *lineptr[], int left, int right,
 
 {
 	if(left<right){
-		int m = l + (r - l) / 2;
+		int middle = left + (right - left) / 2;
 
-		mergesort(lineptr, l, m, comp);
-		mergesort(lineptr, m+1, r,comp);
+		mergesort(lineptr, left, middle, comp);
+		mergesort(lineptr, middle+1, right,comp);
 
-		merge(lineptr, l, m, r, comp);
+		merge(lineptr, left, middle, right, comp);
 	}
 }
 
@@ -27,7 +27,7 @@ void merge(void *lineptr[], int left, int middle, int right,
 		Left[i] = lineptr[left+i];
 
 	for(int i=0; i< index2; i++ )
-		Right[j] = lineptr[m+1+i];
+		Right[i] = lineptr[middle+1+i];
 
 	int i =0, j=0, k=left;
 
