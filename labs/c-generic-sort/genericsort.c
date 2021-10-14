@@ -77,14 +77,14 @@ int main(int argc, char **argv) {
 			printf("o \n./genericsort strings.txt -mergesort -o ms_sorted_strings.txt\n\n");
 			return -1;
 		}
-		number = 1; // flag to know wether to sort by ints or strs
+		number = 1; 
 	} else if (argc != 5) {
 		printf("El formato debe ser:\n ./genericsort -n numbers.txt -quicksort -o qs_sorted_numbers.txt\n ");
 		printf("o \n./genericsort strings.txt -mergesort -o ms_sorted_strings.txt\n\n");
 		return -1;
 	}
 
-	strcat(inputName, argv[1+number]); // input file name
+	strcat(inputName, argv[1+number]); 
 
 	if (strcmp(argv[3+number], "-o") != 0) {
 		printf("El formato debe ser:\n ./genericsort -n numbers.txt -quicksort -o qs_sorted_numbers.txt\n ");
